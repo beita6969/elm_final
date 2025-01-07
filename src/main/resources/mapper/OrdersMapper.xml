@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zmd.elm.mapper.OrdersMapper">
+	<resultMap type="com.zmd.elm.po.Orders" id="ordersresultMap">
+		<result property="orderId" column="orderId" />
+		<result property="userId" column="userId" />
+		<result property="businessId" column="businessId" />
+		<result property="orderDate" column="orderDate" />
+		<result property="orderTotal" column="orderTotal" />
+		<result property="daId" column="daId" />
+		<result property="orderState" column="orderState" javaType="java.lang.Integer"/>
+		<association property="business" javaType="com.zmd.elm.po.Business"
+			select="com.zmd.elm.mapper.BusinessMapper.getBusinessById"
+				column="businessId" />
+		<collection property="list" ofType="com.zmd.elm.po.OrderDetailet"
+			select="com.zmd.elm.mapper.OrderDetailetMapper.listOrderDetailetByOrderId"
+				column="orderId" />
+	</resultMap>
+	<insert id="saveOrders" parameterType="com.zmd.elm.po.Orders" useGeneratedKeys="true" keyProperty="orderId">
+		INSERT INTO orders (userId, businessId, orderDate, orderTotal, daId, orderState) 
+		VALUES (#{userId}, #{businessId}, #{orderDate}, #{orderTotal}, #{daId}, #{orderState})
+	</insert>
+	<select id="getOrdersByOrderId" parameterType="Integer" resultMap="ordersresultMap">
+		SELECT orderId, userId, businessId, orderDate, orderTotal, daId, CAST(orderState AS SIGNED) as orderState 
+		FROM orders WHERE orderId = #{orderId}
+	</select>
+	
+	<select id="listOrdersByUserId" parameterType="String" resultMap="ordersresultMap">
+		SELECT orderId, userId, businessId, orderDate, orderTotal, daId, CAST(orderState AS SIGNED) as orderState 
+		FROM orders WHERE userId = #{userId} ORDER BY orderDate DESC, orderId DESC
+	</select>
+
+</mapper>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zmd.elm.mapper.CartMapper">
+	<delete id="removeCart" parameterType="com.zmd.elm.po.Cart">
+		DELETE from cart
+		<where>
+			businessId=#{businessId} AND userId = #{userId}
+			<if test=" foodId != null and foodId != '' ">
+				and foodId = #{foodId}
+			</if>
+		</where>
+	</delete>
+
+	<resultMap type="com.zmd.elm.po.Cart" id="cartResultMap">
+		<id property="cartId" column="cartId" />
+		<result property="foodId" column="foodId" />
+		<result property="businessId" column="businessId" />
+		<result property="userId" column="userId" />
+		<result property="quantity" column="quantity" />
+		
+		<association property="food" javaType="com.zmd.elm.po.Food"
+                     select="com.zmd.elm.mapper.FoodMapper.getFoodById" column="foodId">
+		</association>
+		
+		<association property="business" javaType="com.zmd.elm.po.Business"
+			select="com.zmd.elm.mapper.BusinessMapper.getBusinessById"
+			column="businessId">
+		</association>
+	</resultMap>
+
+	<select id="listCart" parameterType="com.zmd.elm.po.Cart" resultMap="cartResultMap">
+		select * from cart
+		<where>
+			userId=#{userId}
+			<if test="businessId!=null and businessId!=''">
+				and businessId= #{businessId}
+			</if>
+		</where>
+		order by cartId
+	</select>
+</mapper>
